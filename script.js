@@ -45,40 +45,51 @@ function initCustomCursor() {
 
 function initThemeSwitcher() {
   const topbar = document.querySelector('.topbar');
-  if (!topbar) return;
+  const actions = topbar?.querySelector('.header-actions');
+  if (!topbar || !actions) return;
+
+  const themes = [
+    { name: 'cyberpunk', label: 'Violeta' },
+    { name: 'emerald', label: 'Esmeralda' },
+    { name: 'ocean', label: 'Océano' },
+    { name: 'sunset', label: 'Atardecer' }
+  ];
 
   const themeBtn = document.createElement('button');
   themeBtn.className = 'theme-toggle-btn';
-  themeBtn.setAttribute('type', 'button');
-  themeBtn.setAttribute('aria-label', 'Cambiar tema de color');
-  themeBtn.innerHTML = '🎨 <span>Tema</span>';
+  themeBtn.type = 'button';
+  themeBtn.setAttribute('aria-label', 'Cambiar paleta de colores');
+  themeBtn.setAttribute('title', 'Cambiar color de la página');
+  themeBtn.setAttribute('aria-live', 'polite');
 
-  const navCta = topbar.querySelector('.nav-cta');
-  if (navCta && navCta.parentNode === topbar) {
-    topbar.insertBefore(themeBtn, navCta);
-  } else {
-    topbar.appendChild(themeBtn);
-  }
-
-  const themes = [
-    { name: 'cyberpunk', label: '💜 Ciber' },
-    { name: 'emerald', label: '🟢 Esmeralda' },
-    { name: 'sunset', label: '🌅 Atardecer' }
-  ];
+  // Restore the user's last selected palette when possible.
   let currentThemeIndex = 0;
+  try {
+    const savedTheme = localStorage.getItem('portfolio-theme');
+    const savedIndex = themes.findIndex(theme => theme.name === savedTheme);
+    if (savedIndex >= 0) currentThemeIndex = savedIndex;
+  } catch (_) {}
 
-  themeBtn.addEventListener('click', (e) => {
-    currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+  const applyTheme = () => {
     const theme = themes[currentThemeIndex];
     document.body.setAttribute('data-theme', theme.name);
+    themeBtn.innerHTML = `<span class="theme-swatch" aria-hidden="true"></span><span class="theme-label">${theme.label}</span><span class="theme-arrows" aria-hidden="true">↻</span>`;
+    themeBtn.setAttribute('aria-label', `Tema actual: ${theme.label}. Pulsa para cambiar`);
+    themeBtn.setAttribute('title', `Tema: ${theme.label} · Cambiar paleta`);
+    try { localStorage.setItem('portfolio-theme', theme.name); } catch (_) {}
+  };
 
-    const span = themeBtn.querySelector('span');
-    if (span) span.textContent = theme.name;
-
+  themeBtn.addEventListener('click', (event) => {
+    currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+    applyTheme();
     if (typeof createClickBurst === 'function') {
-      createClickBurst(e.clientX, e.clientY);
+      createClickBurst(event.clientX, event.clientY);
     }
   });
+
+  // Keep the theme control beside GitHub, inside the actions group.
+  actions.appendChild(themeBtn);
+  applyTheme();
 }
 
 function initParticleCanvas() {
