@@ -1,8 +1,3 @@
-/**
- * Diana Li Gayoso (peruvianMiau) - Portfolio Script
- * Custom cursors (Normal Cat + Pointer Cat) + Compact corner desk mascot.
- */
-
 document.addEventListener('DOMContentLoaded', () => {
   try { initCustomCursor(); } catch(e) { console.warn('Custom cursor init skipped:', e); }
   try { initThemeSwitcher(); } catch(e) { console.warn('Theme switcher init skipped:', e); }
